@@ -1,0 +1,65 @@
+managed implementation in class ZBP_R_TFLIGHT_CA1 unique;
+strict ( 2 );
+with draft;
+extensible;
+define behavior for ZR_TFLIGHT_CA1 alias ZrTflightCa1
+persistent table ZTFLIGHT_CA1
+extensible
+draft table ZTFLIGHT_CA1_D
+etag master LocalLastChangedAt
+lock master total etag LastChangedAt
+authorization master( global )
+{
+  field ( mandatory : create )
+   CarrierID,
+   ConnectionID;
+
+  field ( readonly )
+   LocalCreateBy,
+   LocalCreatedAt,
+   LocalLastChangedBy,
+   LocalLastChangedAt,
+   LastChangedAt;
+
+  field ( readonly : update )
+   CarrierID,
+   ConnectionID;
+
+
+  create;
+  update;
+  delete;
+
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Edit;
+  draft action Resume;
+  draft determine action Prepare;
+
+  action cancel_flight result [1] $self;
+
+  mapping for ZTFLIGHT_CA1 corresponding extensible
+  {
+    CarrierID = carrier_id;
+    ConnectionID = connection_id;
+    Price = price;
+    CurrencyCode = currency_code;
+    DepartureAirport = departure_airport;
+    Cityfrom = cityfrom;
+    DestinationAirport = destination_airport;
+    Cityto = cityto;
+    Status = status;
+    LocalCreateBy = local_create_by;
+    LocalCreatedAt = local_created_at;
+    LocalLastChangedBy = local_last_changed_by;
+    LocalLastChangedAt = local_last_changed_at;
+    LastChangedAt = last_changed_at;
+  }
+
+    validation validate_currency on save { field currencycode; field price; }
+  validation validate_carrier   on save { field carrierid; }
+  validation validate_airports  on save { field departureairport; field destinationairport; }
+  validation check_semantic_key on save { create; update; }
+ determination getCities on save { create; field DepartureAirport, DestinationAirport; }
+
+}
